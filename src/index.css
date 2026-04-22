@@ -1,0 +1,92 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;0,800;1,400;1,700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Playfair Display", ui-serif, Georgia, serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+  --color-carbon: #0a0a0a;
+  --color-carbon-2: #131313;
+  --color-ferrari: #E8002D;
+  --color-mclaren: #FF8000;
+  --color-audi: #00877C;
+  
+  /* Dynamic Variables controlled by [data-theme] */
+  --color-paper: var(--paper); 
+  --color-paper-2: var(--paper-2);
+  --color-paper-3: var(--paper-3);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-racing: var(--racing);
+  --color-mercedes: var(--mercedes);
+  --color-redbull: var(--redbull);
+  --color-accent-hero: var(--accent-hero);
+}
+
+:root {
+  /* Default: Red Bull Racing (Dark) */
+  --paper: #00101d;
+  --paper-2: #001a30;
+  --paper-3: #002544;
+  --ink: #ffffff;
+  --ink-2: #8da1b4;
+  --ink-3: #4b6277;
+  --racing: #EF0107;
+  --mercedes: #FFEC13;
+  --redbull: #001A30;
+  --accent-hero: #000c16;
+}
+
+[data-theme='light'] {
+  /* Mercedes-AMG (Brackley Silver/Teal) */
+  --paper: #f1f3f5; /* Light Silver */
+  --paper-2: #ffffff;
+  --paper-3: #dee2e6; /* Medium Silver */
+  --ink: #141619; /* High-contrast Charcoal */
+  --ink-2: #343a40;
+  --ink-3: #6c757d;
+  --racing: #00877c; /* Petronas Teal */
+  --mercedes: #00a19c; 
+  --redbull: #3671C6;
+  --accent-hero: #ffffff;
+}
+
+@layer base {
+  body {
+    @apply bg-paper text-ink font-sans;
+  }
+}
+
+@keyframes ticker {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-ticker {
+  animation: ticker 48s linear infinite;
+}
+
+.checker-bg {
+  background-image: 
+    linear-gradient(45deg, var(--ink) 25%, transparent 25%, transparent 75%, var(--ink) 75%),
+    linear-gradient(45deg, var(--ink) 25%, transparent 25%, transparent 75%, var(--ink) 75%);
+  background-size: 10px 10px;
+  background-position: 0 0, 5px 5px;
+  background-color: transparent;
+  opacity: 0.15;
+}
+
+.paper-grain {
+  position: relative;
+}
+
+.paper-grain::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.05;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
