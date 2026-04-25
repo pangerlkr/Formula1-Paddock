@@ -4,21 +4,55 @@
  */
 
 import { motion, AnimatePresence } from 'motion/react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { DRIVERS } from '../constants.ts';
 import { DriverProfile } from './DriverProfile.tsx';
 import { DriverComparison } from './DriverComparison.tsx';
 import { Driver } from '../types.ts';
-import { GitCompare, ChevronRight, X } from 'lucide-react';
+import { GitCompare, ChevronRight, X, RefreshCw, Loader2 } from 'lucide-react';
+import { fetchFullLiveSync } from '../services/geminiService.ts';
 
 export function DriversStandings({ theme = 'dark' }: { theme?: 'dark' | 'light' }) {
   const [selectedDriver, setSelectedDriver] = useState<Driver | null>(null);
   const [compareMode, setCompareMode] = useState(false);
   const [compareIds, setCompareIds] = useState<string[]>([]);
   const [showComparison, setShowComparison] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [liveDrivers, setLiveDrivers] = useState<Partial<Driver>[]>([]);
+
+  useEffect(() => {
+    const savedSync = localStorage.getItem('f1_live_sync');
+    if (savedSync) {
+      try {
+        const data = JSON.parse(savedSync);
+        if (data.drivers) setLiveDrivers(data.drivers);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  }, []);
+
+  const mergedDrivers = DRIVERS.map(d => {
+    const live = liveDrivers.find(ld => ld.id === d.id);
+    return live ? { ...d, bio: live.bio || d.bio } : d;
+  });
 
   const highlightColor = theme === 'dark' ? '#EF0107' : '#00A19C';
   const highlightTeam = theme === 'dark' ? 'Red Bull' : 'Mercedes';
+
+  const handleLiveSync = async () => {
+    setIsSyncing(true);
+    const data = await fetchFullLiveSync();
+    if (data) {
+      localStorage.setItem('f1_live_sync', JSON.stringify({
+        ...data,
+        timestamp: Date.now()
+      }));
+      window.dispatchEvent(new Event('f1_live_sync_completed'));
+      window.location.reload();
+    }
+    setIsSyncing(false);
+  };
 
   const toggleCompare = (id: string) => {
     setCompareIds(prev => 
@@ -28,23 +62,52 @@ export function DriversStandings({ theme = 'dark' }: { theme?: 'dark' | 'light' 
     );
   };
 
-  const selectedForCompare = DRIVERS.filter(d => compareIds.includes(d.id));
+  const selectedForCompare = mergedDrivers.filter(d => compareIds.includes(d.id));
 
   return (
     <div className="flex flex-col border-b lg:border-b-0 lg:border-r border-ink/10 relative">
       <div className="p-5.5 md:p-6 border-b-2 border-ink bg-paper sticky top-0 z-20">
         <div className="flex justify-between items-start mb-1.5">
           <div className="font-mono text-[9px] text-ink-3 tracking-[0.18em] font-medium">§ 01</div>
-          <button 
-            onClick={() => {
-              setCompareMode(!compareMode);
-              setCompareIds([]);
-            }}
-            className={`flex items-center gap-2 px-2 py-1 font-mono text-[8px] font-bold uppercase tracking-wider transition-all border ${compareMode ? 'bg-racing text-white border-racing' : 'bg-paper text-ink-3 border-ink/10 hover:border-ink hover:text-ink'}`}
-          >
-            <GitCompare size={10} />
-            {compareMode ? 'Exit Compare' : 'Compare Mode'}
-          </button>
+          <div className="flex gap-2">
+            <button 
+              onClick={handleLiveSync}
+              disabled={isSyncing}
+              className={`
+                flex items-center gap-2 px-3 py-1.5 font-mono text-[9px] font-bold uppercase tracking-wider transition-all 
+                border-2 relative overflow-hidden group
+                ${isSyncing 
+                  ? 'bg-racing/20 border-racing text-racing' 
+                  : 'bg-paper text-ink border-ink hover:border-racing hover:text-racing hover:shadow-[0_0_15px_rgba(239,1,7,0.3)] shadow-sm'
+                }
+                disabled:opacity-50
+              `}
+              title="Sync with Live Pit Wall Data"
+            >
+              {/* Scanline effect on hover */}
+              <div className="absolute inset-0 w-full h-full bg-linear-to-b from-transparent via-racing/5 to-transparent -translate-y-full group-hover:animate-[scan_1.5s_linear_infinite]" />
+              
+              {isSyncing ? <Loader2 size={12} className="animate-spin" /> : <RefreshCw size={12} className="group-hover:rotate-180 transition-transform duration-500" />}
+              {isSyncing ? 'Syncing...' : 'Pit Wall Sync'}
+            </button>
+            <button 
+              onClick={() => {
+                setCompareMode(!compareMode);
+                setCompareIds([]);
+              }}
+              className={`
+                flex items-center gap-2 px-3 py-1.5 font-mono text-[9px] font-bold uppercase tracking-wider transition-all 
+                border-2 relative group
+                ${compareMode 
+                  ? 'bg-racing text-white border-racing shadow-[0_0_20px_rgba(239,1,7,0.4)]' 
+                  : 'bg-paper text-ink border-ink hover:border-racing hover:text-racing hover:shadow-[0_0_15px_rgba(239,1,7,0.3)] shadow-sm'
+                }
+              `}
+            >
+              <GitCompare size={12} className={compareMode ? 'animate-pulse' : 'group-hover:scale-110 transition-transform'} />
+              {compareMode ? 'Comparing' : 'Compare Mode'}
+            </button>
+          </div>
         </div>
         <h3 className="font-serif text-2xl font-bold tracking-tight text-ink leading-none">
           Drivers' <span className="italic text-racing font-medium">Championship</span>
@@ -53,7 +116,7 @@ export function DriversStandings({ theme = 'dark' }: { theme?: 'dark' | 'light' 
       </div>
 
       <div className="flex flex-col divide-y divide-ink/10">
-        {DRIVERS.map((driver, i) => {
+        {mergedDrivers.map((driver, i) => {
           const isCoreTeam = driver.team.includes(highlightTeam);
           const isSelectedForCompare = compareIds.includes(driver.id);
 
@@ -112,6 +175,20 @@ export function DriversStandings({ theme = 'dark' }: { theme?: 'dark' | 'light' 
                 {!compareMode && (
                   <div className="md:hidden group-hover:block absolute right-6 bottom-1 font-mono text-[6px] text-racing uppercase tracking-tighter opacity-0 group-hover:opacity-100 transition-opacity">View Profile</div>
                 )}
+              </div>
+
+              {/* Relative Performance Gauge */}
+              <div className="col-start-2 col-span-2 -mt-1 pb-1">
+                <div className="h-1 bg-ink/5 relative overflow-hidden">
+                   <motion.div 
+                      key={`${driver.id}-${driver.pts}`}
+                      initial={{ scaleX: 0 }}
+                      animate={{ scaleX: driver.pts / mergedDrivers[0].pts }}
+                      transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1], delay: (i * 0.05) }}
+                      className="absolute inset-0 origin-left opacity-70"
+                      style={{ backgroundColor: driver.color }}
+                   />
+                </div>
               </div>
               
               {/* Leader badge */}

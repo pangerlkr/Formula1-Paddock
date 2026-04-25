@@ -14,9 +14,23 @@ export function PaddockIntel({ theme = 'dark' }: { theme?: 'dark' | 'light' }) {
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const [news, setNews] = useState<NewsItem[]>(NEWS);
   const [loading, setLoading] = useState(false);
+  const [techSummary, setTechSummary] = useState<string | null>(null);
 
   const teamBase = theme === 'dark' ? 'Milton Keynes' : 'Brackley';
   const teamIntelLabel = theme === 'dark' ? 'Bull Insight' : 'Brackley Intel';
+
+  useEffect(() => {
+    const savedSync = localStorage.getItem('f1_live_sync');
+    if (savedSync) {
+      try {
+        const data = JSON.parse(savedSync);
+        if (data.news && data.news.length > 0) setNews(data.news);
+        if (data.paddockIntel) setTechSummary(data.paddockIntel);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  }, []);
 
   const getLiveIntel = async () => {
     setLoading(true);
@@ -62,6 +76,27 @@ export function PaddockIntel({ theme = 'dark' }: { theme?: 'dark' | 'light' }) {
           {!loading && <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />}
         </div>
       </div>
+
+      {techSummary && (
+        <motion.div 
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: 'auto' }}
+          className="p-5.5 md:p-6 pb-0"
+        >
+          <div className="p-4 bg-ink/[0.03] border-l-2 border-racing relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-1 opacity-10">
+              <RefreshCw size={40} className="rotate-12" />
+            </div>
+            <div className="font-mono text-[8px] uppercase tracking-[0.2em] mb-2 text-racing font-bold flex items-center gap-2">
+              <span className="w-2 h-0.5 bg-racing" />
+              Strategic Intelligence Summary
+            </div>
+            <p className="font-serif italic text-sm text-ink-2 leading-relaxed">
+              "{techSummary}"
+            </p>
+          </div>
+        </motion.div>
+      )}
 
       {/* Podium Result */}
       <div className="p-5.5 md:p-6 border-b border-ink/10">

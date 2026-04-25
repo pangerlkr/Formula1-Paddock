@@ -19,7 +19,15 @@ export function Hero({ theme = 'dark' }: { theme?: 'dark' | 'light' }) {
     const D = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
     const M = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
     setDateStr(`${D[now.getDay()]} · ${String(now.getDate()).padStart(2,'0')} ${M[now.getMonth()]} · ${now.getFullYear()}`);
+    
+    // Check for sync status
+    const savedSync = localStorage.getItem('f1_live_sync');
+    if (savedSync) {
+      setIsLive(true);
+    }
   }, []);
+
+  const [isLive, setIsLive] = useState(false);
 
   const teamName = theme === 'dark' ? 'RBR' : 'MERC';
   const teamBase = theme === 'dark' ? 'Milton Keynes' : 'Brackley';
@@ -158,6 +166,12 @@ export function Hero({ theme = 'dark' }: { theme?: 'dark' | 'light' }) {
             <span className="w-2 h-2 bg-mercedes rounded-full animate-pulse" />
             {theme === 'dark' ? 'Oracle Cloud Sync' : 'Petronas Data Link'}
           </span>
+          {isLive && (
+            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-green-500/10 border border-green-500/20 text-green-500 font-bold text-[8px] tracking-[0.2em]">
+              <div className="w-1 h-1 bg-green-500 rounded-full animate-ping" />
+              PIT WALL LIVE
+            </span>
+          )}
           <div className="flex flex-col">
             <span className="text-[9px] text-mercedes font-bold leading-none mb-1 uppercase tracking-tighter">Status: {teamSlogan}</span>
             <span className="text-[10px] text-ink font-bold leading-none tracking-widest flex items-center gap-1.5">

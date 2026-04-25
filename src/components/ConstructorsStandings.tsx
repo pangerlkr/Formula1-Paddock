@@ -4,10 +4,29 @@
  */
 
 import { motion } from 'motion/react';
+import { useState, useEffect } from 'react';
 import { TEAMS } from '../constants.ts';
+import { Team } from '../types.ts';
 
 export function ConstructorsStandings({ theme = 'dark' }: { theme?: 'dark' | 'light' }) {
-  const maxPts = TEAMS[0].pts;
+  const [liveTeams, setLiveTeams] = useState<Team[]>(TEAMS);
+
+  useEffect(() => {
+    const checkSync = () => {
+      const saved = localStorage.getItem('f1_live_sync');
+      if (saved) {
+        try {
+          const data = JSON.parse(saved);
+          if (data.teams) setLiveTeams(data.teams);
+        } catch (e) { console.error(e); }
+      }
+    };
+    checkSync();
+    window.addEventListener('f1_live_sync_completed', checkSync);
+    return () => window.removeEventListener('f1_live_sync_completed', checkSync);
+  }, []);
+
+  const maxPts = liveTeams.length > 0 ? Math.max(...liveTeams.map(t => t.pts)) : 0;
   const highlightTeam = theme === 'dark' ? 'Red Bull' : 'Mercedes';
 
   return (
@@ -21,7 +40,7 @@ export function ConstructorsStandings({ theme = 'dark' }: { theme?: 'dark' | 'li
       </div>
 
       <div className="flex flex-col">
-        {TEAMS.map((team, i) => {
+        {liveTeams.map((team, i) => {
           const isCoreTeam = team.name.includes(highlightTeam);
           return (
             <motion.div 
@@ -47,14 +66,27 @@ export function ConstructorsStandings({ theme = 'dark' }: { theme?: 'dark' | 'li
                 <div className="font-mono text-lg font-bold text-ink tabular-nums leading-none tracking-tight">{team.pts}</div>
               </div>
 
-              <div className="h-1 bg-paper-3 relative overflow-hidden">
-                 <motion.div 
-                    initial={{ scaleX: 0 }}
-                    animate={{ scaleX: team.pts / maxPts }}
-                    transition={{ duration: 1.4, ease: [0.3, 0.9, 0.3, 1], delay: 2.2 + i * 0.05 }}
-                    className="absolute inset-0 origin-left"
-                    style={{ backgroundColor: team.color }}
-                 />
+              <div className="mt-4">
+                <div className="flex justify-between items-center mb-1.5">
+                  <div className="font-mono text-[8px] text-ink-3 uppercase tracking-[0.2em] font-bold">Relative Performance</div>
+                  <div className="font-mono text-[9px] text-ink font-bold tabular-nums italic">{(team.pts / maxPts * 100).toFixed(1)}%</div>
+                </div>
+                <div className="h-2 bg-ink/5 relative overflow-hidden ring-1 ring-ink/5">
+                   <motion.div 
+                      key={`${team.id}-${team.pts}`}
+                      initial={{ scaleX: 0 }}
+                      animate={{ scaleX: maxPts > 0 ? team.pts / maxPts : 0 }}
+                      transition={{ duration: 1.8, ease: [0.16, 1, 0.3, 1], delay: (i * 0.1) }}
+                      className="absolute inset-0 origin-left"
+                      style={{ backgroundColor: team.color }}
+                   />
+                   {/* Scanning mask effect */}
+                   <motion.div 
+                      animate={{ x: ['-100%', '200%'] }}
+                      transition={{ duration: 3, repeat: Infinity, ease: "linear", delay: i * 0.2 }}
+                      className="absolute inset-y-0 w-20 bg-linear-to-r from-transparent via-white/20 to-transparent skew-x-[-20deg]"
+                   />
+                </div>
               </div>
             </motion.div>
           );

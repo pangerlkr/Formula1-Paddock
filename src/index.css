@@ -23,6 +23,11 @@
   --color-mercedes: var(--mercedes);
   --color-redbull: var(--redbull);
   --color-accent-hero: var(--accent-hero);
+
+  @keyframes scan {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(100%); }
+  }
 }
 
 :root {

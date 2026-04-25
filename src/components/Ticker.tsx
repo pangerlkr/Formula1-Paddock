@@ -21,7 +21,21 @@ export function Ticker({ theme = 'dark' }: { theme?: 'dark' | 'light' }) {
   const [items, setItems] = useState<{ sym: string; val: string; pts: string }[]>(defaultItems);
 
   useEffect(() => {
-    // Reset to theme defaults when theme changes
+    // Check for global live sync data first
+    const savedSync = localStorage.getItem('f1_live_sync');
+    if (savedSync) {
+      try {
+        const data = JSON.parse(savedSync);
+        if (data.ticker && data.ticker.length > 0) {
+          setItems(data.ticker);
+          return;
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    // Fallback to theme defaults
     setItems(defaultItems);
     
     const getLiveTicker = async () => {
