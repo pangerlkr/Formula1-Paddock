@@ -139,6 +139,99 @@ export function DriverComparison({ isOpen, drivers, onClose, theme }: DriverComp
                   </motion.div>
                 ))}
 
+                {/* Head-to-Head Section */}
+                {drivers.length === 2 && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4 }}
+                    className="col-span-1 md:col-span-2 pt-8 border-t-2 border-ink"
+                  >
+                    <div className="flex items-center gap-4 mb-8">
+                       <div className="h-[1px] flex-1 bg-ink/20" />
+                       <div className="flex items-center gap-2 font-mono text-[11px] font-black uppercase tracking-[0.4em] text-racing">
+                         <div className="flex -space-x-1">
+                           <div className="w-1.5 h-1.5 bg-racing" />
+                           <div className="w-1.5 h-1.5 bg-ink" />
+                         </div>
+                         Direct Combat Data
+                       </div>
+                       <div className="h-[1px] flex-1 bg-ink/20" />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-12 px-4 md:px-12 pb-8">
+                      {/* Win Ratio */}
+                      <div className="flex flex-col items-center">
+                        <div className="font-mono text-[9px] text-ink-3 uppercase tracking-widest mb-6">Career Win Duel</div>
+                        <div className="flex items-center gap-4 w-full">
+                          <div className="font-serif text-3xl font-black text-racing">{drivers[0].careerStats?.wins || 0}</div>
+                          <div className="flex-1 h-3 flex gap-1 items-center px-1 border border-ink/10 bg-ink/5">
+                            <div 
+                              className="h-1 bg-racing transition-all duration-1000" 
+                              style={{ width: `${(drivers[0].careerStats?.wins || 0) / ((drivers[0].careerStats?.wins || 0) + (drivers[1].careerStats?.wins || 1)) * 100}%` }}
+                            />
+                            <div className="w-[1px] h-2 bg-ink/20" />
+                            <div 
+                              className="h-1 bg-mercedes transition-all duration-1000" 
+                              style={{ width: `${(drivers[1].careerStats?.wins || 0) / ((drivers[0].careerStats?.wins || 0) + (drivers[1].careerStats?.wins || 1)) * 100}%` }}
+                            />
+                          </div>
+                          <div className="font-serif text-3xl font-black text-mercedes">{drivers[1].careerStats?.wins || 0}</div>
+                        </div>
+                        <div className="mt-4 flex justify-between w-full font-mono text-[8px] text-ink-3 font-bold uppercase tracking-tighter">
+                          <span>{drivers[0].code} Wins</span>
+                          <span>{drivers[1].code} Wins</span>
+                        </div>
+                      </div>
+
+                      {/* Points Gap */}
+                      <div className="flex flex-col items-center">
+                        <div className="font-mono text-[9px] text-ink-3 uppercase tracking-widest mb-6">Current Standing Gap</div>
+                        <div className="flex items-center justify-center gap-3">
+                          <div className="w-12 h-[1px] bg-ink/20" />
+                          <div className="font-serif text-5xl font-black text-ink italic leading-none">
+                            {Math.abs(drivers[0].pts - drivers[1].pts)}
+                          </div>
+                          <div className="w-12 h-[1px] bg-ink/20" />
+                        </div>
+                        <div className="mt-4 font-mono text-[8px] text-ink-3 font-bold uppercase tracking-widest bg-ink/5 px-3 py-1">
+                          POINTS DIFFERENTIAL
+                        </div>
+                      </div>
+
+                      {/* Performance Index */}
+                      <div className="flex flex-col items-center">
+                        <div className="font-mono text-[9px] text-ink-3 uppercase tracking-widest mb-6">Finish Bias (Last 5)</div>
+                        <div className="flex items-center gap-4 w-full">
+                           <div className="flex flex-col items-center gap-1">
+                             <div className="font-mono text-xl font-bold text-ink">{(100 / drivers[0].pos).toFixed(1)}</div>
+                             <div className="w-8 h-1 bg-racing" />
+                           </div>
+                           <div className="flex-1 flex gap-0.5 justify-center items-end h-10 pb-1">
+                              {[0.4, 0.7, 0.5, 0.8, 0.6].map((h, i) => (
+                                <motion.div 
+                                  key={i}
+                                  initial={{ height: 0 }}
+                                  animate={{ height: `${h * 100}%` }}
+                                  transition={{ delay: 0.6 + i * 0.05 }}
+                                  className={`w-2 ${i % 2 === 0 ? 'bg-racing/40' : 'bg-mercedes/40'}`}
+                                />
+                              ))}
+                           </div>
+                           <div className="flex flex-col items-center gap-1">
+                             <div className="font-mono text-xl font-bold text-ink">{(100 / drivers[1].pos).toFixed(1)}</div>
+                             <div className="w-8 h-1 bg-mercedes" />
+                           </div>
+                        </div>
+                        <div className="mt-4 flex justify-between w-full font-mono text-[8px] text-ink-3 font-bold uppercase tracking-tighter">
+                          <span>{drivers[0].code} INDEX</span>
+                          <span>{drivers[1].code} INDEX</span>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+
                 {drivers.length === 1 && (
                   <div className="flex flex-col items-center justify-center p-8 text-center border-2 border-dashed border-ink/10 md:ml-12 min-h-[300px]">
                     <div className="w-12 h-12 bg-ink/5 rounded-full flex items-center justify-center mb-4 text-ink-3">

@@ -27,7 +27,7 @@ import { Footer } from './components/Footer.tsx';
 
 export default function App() {
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
-  const [lastSync, setLastSync] = useState<number | null>(null);
+  const [syncInfo, setSyncInfo] = useState<{ timestamp: number; latency: number } | null>(null);
 
   useEffect(() => {
     const checkSync = () => {
@@ -35,7 +35,12 @@ export default function App() {
       if (saved) {
         try {
           const data = JSON.parse(saved);
-          if (data.timestamp) setLastSync(data.timestamp);
+          if (data.timestamp) {
+            setSyncInfo({ 
+              timestamp: data.timestamp, 
+              latency: data.latency || 0 
+            });
+          }
         } catch (e) {
           console.error(e);
         }
@@ -96,20 +101,41 @@ export default function App() {
 
       {/* Sync Status Indicator */}
       <AnimatePresence>
-        {lastSync && (
+        {syncInfo && (
           <motion.div 
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, x: 20, scale: 0.9 }}
+            animate={{ opacity: 1, x: 0, scale: 1 }}
+            exit={{ opacity: 0, x: 20, scale: 0.9 }}
             className="fixed bottom-6 right-6 z-50 pointer-events-none hidden md:block"
           >
-            <div className="flex items-center gap-3 px-4 py-2 bg-paper border border-ink/10 shadow-xl ring-1 ring-ink/5 rounded-xs">
+            <div className="flex items-center gap-4 px-4 py-3 bg-paper border-2 border-ink shadow-[0_20px_50px_rgba(0,0,0,0.3)] rounded-xs group overflow-hidden relative">
+              {/* Background scanning effect */}
+              <motion.div 
+                animate={{ x: ['-100%', '200%'] }}
+                transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                className="absolute inset-0 bg-linear-to-r from-transparent via-racing/5 to-transparent skew-x-12 translate-x-1/2"
+              />
+              
               <div className="relative">
-                <RefreshCw size={12} className="text-racing animate-[spin_4s_linear_infinite]" />
+                <RefreshCw size={14} className="text-racing animate-[spin_3s_linear_infinite]" />
                 <div className="absolute inset-0 bg-racing/20 rounded-full animate-ping scale-150" />
               </div>
-              <div className="flex flex-col">
-                <span className="font-mono text-[8px] text-ink-3 uppercase tracking-widest font-bold">Pit Wall Link</span>
-                <span className="font-mono text-[9px] text-ink font-bold tabular-nums">Sync: {formatLastSync(lastSync)}</span>
+
+              <div className="flex flex-col relative">
+                <div className="flex items-center gap-2 mb-0.5">
+                  <span className="font-mono text-[9px] text-ink font-black uppercase tracking-widest bg-ink text-paper px-1.5 py-0.5">
+                    Live Link
+                  </span>
+                  <span className={`w-1.5 h-1.5 rounded-full ${syncInfo.latency < 50 ? 'bg-green-500' : 'bg-yellow-500'} animate-pulse`} />
+                </div>
+                <div className="flex items-baseline gap-3">
+                   <span className="font-mono text-[10px] text-ink font-bold tabular-nums">
+                     {formatLastSync(syncInfo.timestamp)}
+                   </span>
+                   <span className="font-mono text-[8px] text-ink-3 uppercase font-medium">
+                     {syncInfo.latency}ms Latency
+                   </span>
+                </div>
               </div>
             </div>
           </motion.div>

@@ -13,6 +13,30 @@ import { GitCompare, ChevronRight, X, RefreshCw, Loader2 } from 'lucide-react';
 import { fetchFullLiveSync } from '../services/geminiService.ts';
 import { f1Service } from '../services/f1Service.ts';
 
+const getFlag = (countryCode: string) => {
+  const flags: Record<string, string> = {
+    'ITA': '🇮🇹',
+    'GBR': '🇬🇧',
+    'MON': '🇲🇨',
+    'AUS': '🇦🇺',
+    'NED': '🇳🇱',
+    'FRA': '🇫🇷',
+    'ESP': '🇪🇸',
+    'MEX': '🇲🇽',
+    'CAN': '🇨🇦',
+    'JPN': '🇯🇵',
+    'USA': '🇺🇸',
+    'DEU': '🇩🇪',
+    'AUT': '🇦🇹',
+    'FIN': '🇫🇮',
+    'THA': '🇹🇭',
+    'BRA': '🇧🇷',
+    'CHN': '🇨🇳',
+    'DNK': '🇩🇰',
+  };
+  return flags[countryCode] || '';
+};
+
 export function DriversStandings({ theme = 'dark' }: { theme?: 'dark' | 'light' }) {
   const [selectedDriver, setSelectedDriver] = useState<Driver | null>(null);
   const [compareMode, setCompareMode] = useState(false);
@@ -20,6 +44,8 @@ export function DriversStandings({ theme = 'dark' }: { theme?: 'dark' | 'light' 
   const [showComparison, setShowComparison] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
   const [liveDrivers, setLiveDrivers] = useState<Partial<Driver>[]>([]);
+
+  const [selectedNationality, setSelectedNationality] = useState<string | null>(null);
 
   useEffect(() => {
     const savedSync = localStorage.getItem('f1_live_sync');
@@ -33,10 +59,24 @@ export function DriversStandings({ theme = 'dark' }: { theme?: 'dark' | 'light' 
     }
   }, []);
 
-  const mergedDrivers = DRIVERS.map(d => {
+  const nationalities = Array.from(new Set(DRIVERS.map(d => d.country))).sort();
+
+  const filteredDrivers = DRIVERS.filter(d => 
+    !selectedNationality || d.country === selectedNationality
+  );
+
+  const mergedDrivers = filteredDrivers.map(d => {
     const live = liveDrivers.find(ld => ld.id === d.id);
-    return live ? { ...d, bio: live.bio || d.bio } : d;
-  });
+    if (!live) return d;
+    
+    return { 
+      ...d, 
+      pts: (live.pts as number) || d.pts,
+      pos: (live.pos as number) || d.pos,
+      gap: (live.gap as number | string) || d.gap,
+      bio: live.bio || d.bio 
+    };
+  }).sort((a, b) => a.pos - b.pos);
 
   const highlightColor = theme === 'dark' ? '#EF0107' : '#00A19C';
   const highlightTeam = theme === 'dark' ? 'Red Bull' : 'Mercedes';
@@ -129,7 +169,49 @@ export function DriversStandings({ theme = 'dark' }: { theme?: 'dark' | 'light' 
         <h3 className="font-serif text-2xl font-bold tracking-tight text-ink leading-none">
           Drivers' <span className="italic text-racing font-medium">Championship</span>
         </h3>
-        <div className="font-mono text-[9px] tracking-widest uppercase text-ink-3 mt-2.5">Top 10 · {theme === 'dark' ? 'Milton Keynes' : 'Brackley'} Sync · ⭐</div>
+        <div className="font-mono text-[9px] tracking-widest uppercase text-ink-3 mt-2.5 flex items-center justify-between">
+          <span>Top 10 · {theme === 'dark' ? 'Milton Keynes' : 'Brackley'} Sync · ⭐</span>
+          {selectedNationality && (
+            <button 
+              onClick={() => setSelectedNationality(null)}
+              className="text-racing hover:underline cursor-pointer font-bold"
+            >
+              Clear Filter
+            </button>
+          )}
+        </div>
+
+        {/* Nationality Filter */}
+        <div className="flex flex-wrap gap-1.5 mt-4 pt-4 border-t border-ink/5">
+          <button 
+            onClick={() => setSelectedNationality(null)}
+            className={`
+              px-2 py-1 font-mono text-[8px] font-bold uppercase transition-all border
+              ${!selectedNationality 
+                ? 'bg-ink text-paper border-ink' 
+                : 'bg-paper text-ink border-ink/10 hover:border-ink/30 hover:bg-paper-2'
+              }
+            `}
+          >
+            All
+          </button>
+          {nationalities.map(nat => (
+            <button 
+              key={nat}
+              onClick={() => setSelectedNationality(nat)}
+              className={`
+                px-2 py-1 font-mono text-[8px] font-bold uppercase transition-all border flex items-center gap-1
+                ${selectedNationality === nat 
+                  ? 'bg-ink text-paper border-ink shadow-[0_2px_8px_rgba(0,0,0,0.1)] scale-105 z-10' 
+                  : 'bg-paper text-ink border-ink/10 hover:border-ink/30 hover:bg-paper-2'
+                }
+              `}
+            >
+              <span className="text-[10px]">{getFlag(nat)}</span>
+              {nat}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="flex flex-col divide-y divide-ink/10">
@@ -165,7 +247,8 @@ export function DriversStandings({ theme = 'dark' }: { theme?: 'dark' | 'light' 
 
               <div className="flex flex-col">
                 <div className="flex items-center gap-2">
-                  <span className="font-serif text-base font-medium text-ink tracking-tight leading-none">
+                  <span className="font-serif text-base font-medium text-ink tracking-tight leading-none flex items-center gap-1.5">
+                    <span className="text-xs opacity-70 group-hover:scale-125 transition-transform">{getFlag(driver.country)}</span>
                     {driver.name}
                     {isCoreTeam && <span className="ml-1 text-[10px] text-racing opacity-70">⭐</span>}
                   </span>
@@ -180,8 +263,8 @@ export function DriversStandings({ theme = 'dark' }: { theme?: 'dark' | 'light' 
                     {driver.code}
                   </span>
                 </div>
-                <div className="text-[11px] text-ink-3 font-normal mt-0.5">
-                  {driver.team} · {driver.country} 
+                <div className="text-[11px] text-ink-3 font-normal mt-0.5 flex items-center gap-1">
+                  {driver.team} · {getFlag(driver.country)} {driver.country} 
                   {driver.gap !== 0 && <span className="ml-2 font-mono text-[10px] font-medium text-ink-2"> {driver.gap}</span>}
                 </div>
               </div>

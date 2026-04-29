@@ -11,9 +11,27 @@ import { CALENDAR } from '../constants.ts';
 export function SeasonCalendar({ theme = 'dark' }: { theme?: 'dark' | 'light' }) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [selectedRound, setSelectedRound] = useState<number | null>(null);
+  const [fetchingRounds, setFetchingRounds] = useState<Record<number | string, boolean>>({});
+  const [fetchedData, setFetchedData] = useState<Record<number | string, { strategy: string, weather: string }>>({});
 
   const teamIntelLabel = theme === 'dark' ? 'Bull Insight' : 'Brackley Intel';
   const teamAccentColor = theme === 'dark' ? 'var(--color-racing)' : 'var(--color-mercedes)';
+
+  const handleFetchData = (round: number | string) => {
+    setFetchingRounds(prev => ({ ...prev, [round]: true }));
+    
+    // Simulate a network delay for the "telemetry uplink"
+    setTimeout(() => {
+      setFetchedData(prev => ({
+        ...prev,
+        [round]: {
+          strategy: Math.random() > 0.5 ? 'S-M-M · Optimized Attack' : 'M-H · Endurance Load',
+          weather: Math.random() > 0.7 ? 'Overcast · 22°C' : 'Clear Skies · 28°C'
+        }
+      }));
+      setFetchingRounds(prev => ({ ...prev, [round]: false }));
+    }, 1500);
+  };
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -69,8 +87,7 @@ export function SeasonCalendar({ theme = 'dark' }: { theme?: 'dark' | 'light' })
             initial={{ scaleX: 0 }}
             animate={{ scaleX: 0.23 }}
             transition={{ duration: 1.6, ease: [0.3, 0.9, 0.3, 1], delay: 1 }}
-            className="h-full bg-linear-to-r from-racing to-mercedes origin-left"
-            style={{ backgroundImage: `linear-to-r from-${theme === 'dark' ? 'racing' : 'mercedes'} to-${theme === 'dark' ? 'mercedes' : 'racing'}` }}
+            className="h-full origin-left bg-racing"
           />
         </div>
 
@@ -87,7 +104,7 @@ export function SeasonCalendar({ theme = 'dark' }: { theme?: 'dark' | 'light' })
               key={i} 
               onClick={() => setSelectedRound(selectedRound === race.round ? null : race.round)}
               className={`
-                p-6 border-r border-ink/10 relative transition-all duration-300 min-h-[280px] flex flex-col cursor-pointer group
+                p-6 border-r border-ink/10 relative transition-all duration-300 min-h-[300px] flex flex-col cursor-pointer group
                 ${race.isDone ? 'bg-paper-2' : 'bg-paper hover:bg-paper-3'}
                 ${selectedRound === race.round ? `ring-2 ring-inset bg-paper-3 ${theme === 'dark' ? 'ring-racing' : 'ring-mercedes'}` : ''}
               `}
@@ -157,87 +174,173 @@ export function SeasonCalendar({ theme = 'dark' }: { theme?: 'dark' | 'light' })
               <AnimatePresence>
                 {selectedRound === race.round && (
                   <motion.div 
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 10 }}
-                    onClick={(e) => e.stopPropagation()} // Prevent clicking details from closing it
-                    className="absolute inset-0 bg-paper-3 z-50 shadow-2xl flex flex-col border-2 border-ink"
+                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                    onClick={(e) => e.stopPropagation()} 
+                    className="absolute inset-[4px] bg-paper-3 z-50 shadow-2xl flex flex-col border-2 border-ink rounded-xs overflow-hidden"
                   >
-                    <div className="flex-1 p-6 overflow-y-auto scrollbar-thin scrollbar-thumb-ink/20 scrollbar-track-transparent">
+                    <div className="flex-1 p-5 overflow-y-auto scrollbar-none">
                       {race.isDone && race.podiumDetailed ? (
                         <>
-                          <div className="font-mono text-[9px] tracking-widest uppercase text-mercedes mb-5 flex items-center gap-2">
-                            <Flag size={10} fill="currentColor" />
-                            Official Race Result
+                          <div className="font-mono text-[10px] tracking-widest uppercase text-racing font-bold mb-5 flex items-center justify-between">
+                            <span className="flex items-center gap-2">
+                              <Flag size={12} fill="currentColor" />
+                              Official Result
+                            </span>
+                            <span className="text-ink-3 font-medium opacity-50">#{race.round}</span>
                           </div>
-                          <div className="flex flex-col gap-4">
-                            {/* podium list */}
-                            <div className="flex flex-col gap-3">
+
+                          <div className="flex flex-col gap-5">
+                            {/* Podium visualization */}
+                            <div className="flex flex-col gap-2">
                               {race.podiumDetailed.map((p, idx) => (
-                                <div key={idx} className="grid grid-cols-[24px_1fr_auto] gap-3 items-center">
-                                  <span className={`font-mono text-xs font-bold ${idx === 0 ? (theme === 'dark' ? 'text-racing' : 'text-mercedes') : idx === 1 ? 'text-ink-2' : 'text-ink-3'}`}>
-                                    P{idx + 1}
-                                  </span>
-                                  <div className="flex flex-col">
-                                    <span className="text-[13px] font-bold font-serif leading-none text-ink">{p.driver}</span>
-                                    <span className="text-[9px] text-ink-3 uppercase font-mono">{p.team}</span>
+                                <div key={idx} className="relative bg-paper border border-ink/5 p-3 flex items-center gap-4 group/podium">
+                                  <div className={`w-8 h-8 rounded-full border-2 flex items-center justify-center font-mono text-xs font-black
+                                    ${idx === 0 ? 'bg-yellow-500/10 border-yellow-500 text-yellow-600' : 
+                                      idx === 1 ? 'bg-slate-400/10 border-slate-400 text-slate-500' : 
+                                      'bg-amber-700/10 border-amber-800 text-amber-900'}
+                                  `}>
+                                    {idx + 1}
                                   </div>
-                                  <span className="font-mono text-[10px] text-ink-2 tabular-nums">{p.gap}</span>
+                                  <div className="flex-1">
+                                    <div className="font-serif text-[15px] font-bold text-ink leading-none">{p.driver}</div>
+                                    <div className="font-mono text-[8.5px] text-ink-3 uppercase mt-1 tracking-wider">{p.team}</div>
+                                  </div>
+                                  <div className="text-right">
+                                    <div className="font-mono text-[10px] font-bold text-ink tabular-nums">{p.gap}</div>
+                                    <div className="font-mono text-[7px] text-ink-3 uppercase opacity-60">Interval</div>
+                                  </div>
+                                  {/* Team Color Stripe */}
+                                  <div 
+                                    className="absolute left-0 top-0 bottom-0 w-1 opacity-60"
+                                    style={{ backgroundColor: idx === 0 ? 'var(--color-racing)' : idx === 1 ? 'var(--color-mercedes)' : 'var(--color-ferrari)' }}
+                                  />
                                 </div>
                               ))}
                             </div>
 
-                            {/* technical stats */}
-                            <div className="grid grid-cols-2 gap-y-3 gap-x-4 pt-4 border-t border-ink/10">
-                              {race.fastestLap && (
-                                <div className="col-span-2">
-                                  <div className="text-[9px] text-ink-3 uppercase font-mono mb-1">Fastest Lap</div>
-                                  <div className="flex justify-between items-baseline">
-                                    <span className="text-xs font-bold text-racing">{race.fastestLap.driver}</span>
-                                    <span className="text-[10px] font-mono text-ink-2">{race.fastestLap.time}</span>
-                                  </div>
+                            {/* Technical Details Grid */}
+                            <div className="grid grid-cols-2 gap-4 pt-4 border-t border-ink/10">
+                              <div className="col-span-2 bg-paper/30 p-3 border border-ink/5">
+                                <div className="text-[10px] text-ink-3 uppercase font-mono mb-2 flex items-center gap-2">
+                                  <Zap size={10} className="text-racing" />
+                                  Fastest Lap
                                 </div>
-                              )}
-                              <div>
-                                  <div className="text-[9px] text-ink-3 uppercase font-mono mb-1">Strategy</div>
-                                  <div className="text-[11px] font-bold tracking-widest text-ink">{race.strategy}</div>
+                                {race.fastestLap && (
+                                  <div className="flex justify-between items-end">
+                                    <div>
+                                      <div className="text-xs font-bold text-ink">{race.fastestLap.driver}</div>
+                                      <div className="text-[8px] text-ink-3 font-mono">Lap 52/56</div>
+                                    </div>
+                                    <div className="text-[14px] font-mono font-bold text-racing tabular-nums">
+                                      {race.fastestLap.time}
+                                    </div>
+                                  </div>
+                                )}
                               </div>
-                              <div>
-                                  <div className="text-[9px] text-ink-3 uppercase font-mono mb-1">Weather</div>
-                                  <div className="text-[11px] font-bold text-ink">{race.weather}</div>
+
+                              <div className="bg-paper/30 p-3 border border-ink/5">
+                                <div className="text-[10px] text-ink-3 uppercase font-mono mb-2">Strategy</div>
+                                <div className="flex items-center gap-2 mb-2">
+                                  {race.strategy?.split(' · ')[0].split('-').map((tyre, idx) => (
+                                    <div key={idx} className={`w-3 h-3 rounded-full border-2 flex items-center justify-center text-[5px] font-bold
+                                      ${tyre === 'S' ? 'border-racing bg-racing/20 text-racing' : 
+                                        tyre === 'M' ? 'border-yellow-500 bg-yellow-500/20 text-yellow-600' : 
+                                        'border-ink-3 bg-ink-3/20 text-ink-3'}
+                                    `}>
+                                      {tyre}
+                                    </div>
+                                  ))}
+                                </div>
+                                <div className="text-[10px] font-bold text-ink leading-tight">{race.strategy?.split(' · ')[1] || race.strategy}</div>
+                              </div>
+
+                              <div className="bg-paper/30 p-3 border border-ink/5">
+                                <div className="text-[10px] text-ink-3 uppercase font-mono mb-2">Atmosphere</div>
+                                <div className="text-[10px] font-bold text-ink leading-tight">{race.weather}</div>
+                                <div className="text-[8px] text-ink-3 font-mono mt-1 italic">Track Info: DRY</div>
                               </div>
                             </div>
-                            
-                            {race.leadingTeam && (
-                              <div className="mt-1 pt-3 border-t border-ink/10">
-                                <div className="text-[9px] text-ink-3 uppercase font-mono mb-1">WCC Leader</div>
-                                <div className="flex items-center justify-between">
-                                  <span className="text-xs font-bold" style={{ color: race.leadingTeam.color }}>{race.leadingTeam.name}</span>
-                                  <span className="text-[10px] font-mono font-bold text-ink-3">{race.leadingTeam.pts} PTS</span>
-                                </div>
-                              </div>
-                            )}
                           </div>
                         </>
                       ) : (
                         <>
-                          <div className="font-mono text-[9px] tracking-widest uppercase text-mercedes mb-5 flex items-center gap-2">
-                            <Zap size={10} fill="currentColor" />
+                          <div className="font-mono text-[10px] tracking-widest uppercase text-racing font-bold mb-5 flex items-center gap-2">
+                            <Zap size={12} fill="currentColor" />
                             {teamIntelLabel}
                           </div>
-                          <div className="grid gap-5">
-                            <div>
-                              <div className="text-[10px] text-ink-3 uppercase font-mono mb-1">Grip Level</div>
-                              <div className="text-[13px] font-bold text-ink">{i % 2 === 0 ? 'High / Abrasive' : 'Medium / Technical'}</div>
+                          <div className="space-y-6">
+                            <div className="flex gap-3">
+                              <div className="flex-1 bg-paper/30 p-3 border border-ink/5">
+                                <div className="text-[9px] text-ink-3 uppercase font-mono mb-1">Downforce</div>
+                                <div className="text-xs font-bold text-ink">{i % 3 === 0 ? 'High' : 'Med-Low'}</div>
+                              </div>
+                              <div className="flex-1 bg-paper/30 p-3 border border-ink/5">
+                                <div className="text-[9px] text-ink-3 uppercase font-mono mb-1">Grip Level</div>
+                                <div className="text-xs font-bold text-ink">4.2 / 5.0</div>
+                              </div>
                             </div>
-                            <div>
-                              <div className="text-[10px] text-ink-3 uppercase font-mono mb-1">Downforce</div>
-                              <div className="text-[13px] font-bold text-ink">{i % 3 === 0 ? 'High' : 'Medium-Low'}</div>
+
+                            {/* Live Data / Strategy Section */}
+                            <div className="mt-4 pt-4 border-t border-ink/10">
+                              {(race.strategy || fetchedData[race.round]) ? (
+                                <div className="grid grid-cols-2 gap-3">
+                                  <div className="bg-paper/30 p-3 border border-ink/5">
+                                    <div className="text-[9px] text-ink-3 uppercase font-mono mb-2">Strategy Breakdown</div>
+                                    <div className="flex items-center gap-1.5 mb-2">
+                                      {(race.strategy || fetchedData[race.round]?.strategy)?.split(' · ')[0].split('-').map((tyre, idx) => (
+                                        <div key={idx} className={`w-3.5 h-3.5 rounded-full border-2 flex items-center justify-center text-[6px] font-black
+                                          ${tyre === 'S' ? 'border-racing bg-racing/10 text-racing' : 
+                                            tyre === 'M' ? 'border-yellow-500 bg-yellow-500/10 text-yellow-600' : 
+                                            'border-ink-2 bg-ink-2/10 text-ink-3'}
+                                        `}>
+                                          {tyre}
+                                        </div>
+                                      ))}
+                                    </div>
+                                    <div className="text-[10px] font-bold text-ink leading-tight uppercase tabular-nums">
+                                      { (race.strategy || fetchedData[race.round]?.strategy)?.split(' · ')[1] || (race.strategy || fetchedData[race.round]?.strategy) }
+                                    </div>
+                                  </div>
+                                  <div className="bg-paper/30 p-3 border border-ink/5">
+                                    <div className="text-[9px] text-ink-3 uppercase font-mono mb-2">Atmosphere Link</div>
+                                    <div className="text-[10px] font-bold text-ink leading-tight">
+                                      {race.weather || fetchedData[race.round]?.weather}
+                                    </div>
+                                    <div className="text-[8px] text-racing font-mono mt-1 flex items-center gap-1">
+                                      <span className="w-1 h-1 bg-racing rounded-full animate-pulse" />
+                                      LIVE SYNC
+                                    </div>
+                                  </div>
+                                </div>
+                              ) : (
+                                <div className="bg-ink/5 border border-dashed border-ink/20 p-5 flex flex-col items-center text-center">
+                                  <div className="text-[9px] text-ink font-mono uppercase tracking-widest mb-3 opacity-60">
+                                    Strategic Telemetry Unavailable
+                                  </div>
+                                  <button 
+                                    onClick={() => handleFetchData(race.round)}
+                                    disabled={fetchingRounds[race.round]}
+                                    className="px-6 py-2 bg-ink text-paper font-mono text-[9px] font-black uppercase tracking-[0.2em] hover:bg-racing transition-colors disabled:opacity-50 disabled:bg-ink-3"
+                                  >
+                                    {fetchingRounds[race.round] ? (
+                                      <div className="flex items-center gap-2">
+                                        <div className="w-2 h-2 border-t-2 border-paper rounded-full animate-spin" />
+                                        Linking...
+                                      </div>
+                                    ) : (
+                                      'Establish Uplink'
+                                    )}
+                                  </button>
+                                </div>
+                              )}
                             </div>
-                            <div>
-                              <div className="text-[10px] text-ink-3 uppercase font-mono mb-1">Characteristic</div>
-                              <div className="text-[13px] italic font-serif leading-relaxed text-ink-2">
-                                {race.isNext ? "Tight sequences, low margin for error. RB22 setup focus: Mechanical grip." : "Historical technical sector. High rake sensitive zone."}
+
+                            <div className="p-4 bg-ink/5 border-l-2 border-racing">
+                              <div className="text-[9px] text-racing uppercase font-mono font-bold mb-2">Technical Insight</div>
+                              <div className="text-[11px] italic font-serif leading-relaxed text-ink-2">
+                                {race.isNext ? "Tight sequences, low margin for error. Chassis focus: Mechanical grip. Expect tire degradation on front-left through sector 2." : "High raked sensitive zone. Aerodynamic efficiency is paramount on the main straight."}
                               </div>
                             </div>
                           </div>
@@ -245,12 +348,12 @@ export function SeasonCalendar({ theme = 'dark' }: { theme?: 'dark' | 'light' })
                       )}
                     </div>
                     
-                    <div className="p-4 bg-paper-2 border-t border-ink/10">
+                    <div className="p-4 bg-paper-2 border-t border-ink/10 flex gap-2">
                       <button 
                         onClick={(e) => { e.stopPropagation(); setSelectedRound(null); }}
-                        className="w-full py-2.5 border border-ink/30 text-[10px] font-mono hover:bg-paper-3 transition-colors uppercase tracking-widest text-ink active:scale-95 cursor-pointer font-bold"
+                        className="flex-1 py-2.5 bg-ink text-white text-[10px] font-mono hover:bg-ink-2 transition-colors uppercase tracking-widest active:scale-95 cursor-pointer font-black"
                       >
-                        Close Details
+                        Acknowledge
                       </button>
                     </div>
                   </motion.div>
