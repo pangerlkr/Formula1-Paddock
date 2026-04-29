@@ -26,8 +26,22 @@ export function Ticker({ theme = 'dark' }: { theme?: 'dark' | 'light' }) {
     if (savedSync) {
       try {
         const data = JSON.parse(savedSync);
-        if (data.ticker && data.ticker.length > 0) {
-          setItems(data.ticker);
+        let finalItems = data.ticker || defaultItems;
+        
+        // Add weather if available from OpenF1
+        if (data.weather) {
+          const w = data.weather;
+          const weatherItem = { 
+            sym: 'WEATHER', 
+            val: `${w.air_temperature}°C`, 
+            pts: `${w.humidity}% RH` 
+          };
+          // Insert at second position or just push
+          finalItems = [finalItems[0], weatherItem, ...finalItems.slice(1)];
+        }
+
+        if (finalItems && finalItems.length > 0) {
+          setItems(finalItems);
           return;
         }
       } catch (e) {

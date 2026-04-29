@@ -75,9 +75,10 @@ export function TechnicalBrief({ theme = 'dark' }: { theme?: 'dark' | 'light' })
     };
     
     // Live Telemetry Loop
-    const telemetryInterval = setInterval(() => {
+    const telemetryInterval = setInterval(async () => {
       if (isScanning || isDecrypted) {
-        setTelemetry(f1Service.getLiveTelemetry());
+        const data = await f1Service.getLiveTelemetry();
+        setTelemetry(data);
       }
     }, 200);
 

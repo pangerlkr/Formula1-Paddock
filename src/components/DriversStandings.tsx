@@ -11,6 +11,7 @@ import { DriverComparison } from './DriverComparison.tsx';
 import { Driver } from '../types.ts';
 import { GitCompare, ChevronRight, X, RefreshCw, Loader2 } from 'lucide-react';
 import { fetchFullLiveSync } from '../services/geminiService.ts';
+import { f1Service } from '../services/f1Service.ts';
 
 export function DriversStandings({ theme = 'dark' }: { theme?: 'dark' | 'light' }) {
   const [selectedDriver, setSelectedDriver] = useState<Driver | null>(null);
@@ -42,13 +43,29 @@ export function DriversStandings({ theme = 'dark' }: { theme?: 'dark' | 'light' 
 
   const handleLiveSync = async () => {
     setIsSyncing(true);
-    const data = await fetchFullLiveSync();
-    if (data) {
-      localStorage.setItem('f1_live_sync', JSON.stringify({
-        ...data,
-        timestamp: Date.now()
+    
+    // Start both syncs in parallel
+    const [geminiData, f1Timestamp] = await Promise.all([
+      fetchFullLiveSync(),
+      f1Service.syncLiveData()
+    ]);
+
+    if (geminiData && f1Timestamp) {
+      // Data is already saved by f1Service.syncLiveData into 'f1_live_sync'
+      // We need to merge Gemini data into it if we want to keep it consistent
+      const existing = localStorage.getItem('f1_live_sync');
+      if (existing) {
+        const merged = {
+          ...JSON.parse(existing),
+          ...geminiData,
+          timestamp: f1Timestamp // Use the latest timestamp
+        };
+        localStorage.setItem('f1_live_sync', JSON.stringify(merged));
+      }
+      
+      window.dispatchEvent(new CustomEvent('f1_live_sync_completed', { 
+        detail: { timestamp: f1Timestamp } 
       }));
-      window.dispatchEvent(new Event('f1_live_sync_completed'));
       window.location.reload();
     }
     setIsSyncing(false);
