@@ -1,8 +1,4 @@
 <div align="center">
-  <img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
-
-<div align="center">
 
 # 🏎️ Formula1 Paddock
 
@@ -32,7 +28,7 @@ Whether you want to compare your favourite drivers head-to-head, explore detaile
 - 👤 **Driver Profiles** — In-depth stats and career history for every driver on the grid
 - ⚡ **Driver Comparison** — Side-by-side performance breakdowns
 - 📊 **Race Analytics** — Visualised data across seasons and circuits
-- 🤖 **AI Integration** — Google Gemini AI-powered insights and summaries
+- 🤖 **AI Integration** — Gemini AI-powered insights and summaries
 - 📱 **Responsive Design** — Optimised for desktop and mobile
 
 ---
@@ -43,7 +39,7 @@ Whether you want to compare your favourite drivers head-to-head, explore detaile
 |---|---|
 | TypeScript | Core language (98%+ coverage) |
 | Vite | Build tool & dev server |
-| Google Gemini AI | AI-powered insights & analysis |
+| Gemini AI | AI-powered insights & analysis |
 | CSS | Styling & responsive layout |
 
 ---
