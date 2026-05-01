@@ -1,5 +1,5 @@
 <div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+  <img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
 </div>
 
 <div align="center">
@@ -18,61 +18,69 @@
 
 ## 📖 About
 
-**Formula1 Paddock** is an AI-powered web application that brings the excitement of Formula 1 racing to your fingertips. Built with TypeScript and Google Gemini AI, it provides a dynamic paddock experience — from driver profiles and team comparisons to live data syncing and race analytics.
+**Formula1 Paddock** is an AI-powered web application that brings the excitement of Formula 1 racing to your fingertips. Built with TypeScript and Google Gemini AI, it delivers real-time driver data, race analytics, and intelligent insights — all wrapped in a fast, responsive interface designed for both casual fans and die-hard motorsport enthusiasts.
 
-Whether you're a die-hard F1 fan or just getting into motorsport, Formula1 Paddock offers an intuitive and visually rich way to engage with the sport.
+Whether you want to compare your favourite drivers head-to-head, explore detailed race histories, or get AI-generated analysis on team performance, Formula1 Paddock puts the entire F1 world in one place.
 
-### ✨ Features
-
-- 🔴 **Live Data Syncing** — Real-time race and driver data updates
-- 🏁 **Driver Comparison** — Side-by-side stats and performance metrics
-- 👤 **Driver Profiles** — Photos, bios, and team details
-- 📊 **Race Analytics** — Lap times, standings, and championship data
-- 🤖 **AI Integration** — Powered by Google Gemini for intelligent insights
+🔗 **Live App:** [https://paddock.pangerlkr.link](https://paddock.pangerlkr.link)
 
 ---
 
-## 🌐 Live Demo
+## ✨ Features
 
-👉 **[https://paddock.pangerlkr.link](https://paddock.pangerlkr.link)**
-
----
-
-## 🚀 Run Locally
-
-**Prerequisites:** Node.js
-
-1. Install dependencies:
-   ```bash
-   npm install
-   ```
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   ```bash
-   npm run dev
-   ```
-
-> View your app in AI Studio: [https://ai.studio/apps/69b73cca-608e-4e66-bc40-cdd56c9fbf46](https://ai.studio/apps/69b73cca-608e-4e66-bc40-cdd56c9fbf46)
+- 🏁 **Live Race Data** — Up-to-date standings, lap times, and race results
+- 👤 **Driver Profiles** — In-depth stats and career history for every driver on the grid
+- ⚡ **Driver Comparison** — Side-by-side performance breakdowns
+- 📊 **Race Analytics** — Visualised data across seasons and circuits
+- 🤖 **AI Integration** — Google Gemini AI-powered insights and summaries
+- 📱 **Responsive Design** — Optimised for desktop and mobile
 
 ---
 
 ## 🛠️ Tech Stack
 
-| Technology | Usage |
+| Technology | Purpose |
 |---|---|
-| TypeScript | Core language (98%) |
+| TypeScript | Core language (98%+ coverage) |
 | Vite | Build tool & dev server |
-| Google Gemini AI | AI-powered features |
-| CSS | Styling |
+| Google Gemini AI | AI-powered insights & analysis |
+| CSS | Styling & responsive layout |
+
+---
+
+## 🚀 Getting Started
+
+**Prerequisites:** Node.js
+
+1. **Clone the repository**
+
+```bash
+git clone https://github.com/pangerlkr/Formula1-Paddock.git
+cd Formula1-Paddock
+```
+
+2. **Install dependencies**
+
+```bash
+npm install
+```
+
+3. **Set your Gemini API key** — add `GEMINI_API_KEY` in a `.env.local` file
+
+4. **Run the app**
+
+```bash
+npm run dev
+```
+
+---
+
+## 🌐 Live Demo
+
+Experience the app live at: [https://paddock.pangerlkr.link](https://paddock.pangerlkr.link)
 
 ---
 
 ## 📄 License
 
-This project is open source. Feel free to fork, star ⭐, and contribute!
-
----
-
-<div align="center">
-Made with ❤️ by <a href="https://github.com/pangerlkr">pangerlkr</a>
-</div>
+This project is open-source. Feel free to fork, contribute, or build on top of it.
