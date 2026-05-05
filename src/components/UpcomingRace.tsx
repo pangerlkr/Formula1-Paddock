@@ -14,7 +14,7 @@ export function UpcomingRace({ theme = 'dark' }: { theme?: 'dark' | 'light' }) {
 
   useEffect(() => {
     // Target date from the calendar or default
-    const targetDateStr = nextRace.round === 6 ? '2026-05-02T19:00:00Z' : '2026-05-02T19:00:00Z';
+    const targetDateStr = '2026-05-18T13:00:00Z';
     const target = new Date(targetDateStr).getTime();
     const pad = (n: number) => String(Math.max(0, n)).padStart(2, '0');
 
@@ -58,7 +58,7 @@ export function UpcomingRace({ theme = 'dark' }: { theme?: 'dark' | 'light' }) {
               <span className="text-2xl md:text-3xl">{nextRace.flag}</span>
             </div>
             <h2 className="font-serif text-[clamp(42px,6vw,76px)] font-bold leading-none tracking-tight mb-4">
-              {nextRace.country} <span className="italic text-mercedes font-medium text-[0.8em]">{nextRace.circuit === 'Miami' ? 'Grand Prix' : 'Race'}</span>
+              {nextRace.country} <span className="italic text-mercedes font-medium text-[0.8em]">{nextRace.circuit === 'Imola' ? 'Grand Prix' : 'Race'}</span>
             </h2>
             <div className="font-sans text-xs md:text-sm text-white/70 mb-1.5 tracking-wide">
               <strong className="text-white font-medium">{nextRace.location}</strong>
@@ -69,8 +69,8 @@ export function UpcomingRace({ theme = 'dark' }: { theme?: 'dark' | 'light' }) {
 
             <div className="flex flex-wrap gap-6 md:gap-9 mt-6 pt-5.5 border-t border-white/15">
               {[
-                { label: 'Lap Record', val: '1:29.708' },
-                { label: 'Pole 2025', val: theme === 'dark' ? 'M. Verstappen' : 'K. Antonelli' },
+                { label: 'Lap Record', val: '1:15.484' },
+                { label: 'Pole 2025', val: theme === 'dark' ? 'M. Verstappen' : 'G. Russell' },
                 { label: 'Dates', val: nextRace.date },
               ].map((stat, i) => (
                 <div key={i} className="flex flex-col">

@@ -7,49 +7,49 @@ import { Driver, Team, Race, NewsItem } from './types.ts';
 
 export const DRIVERS: Driver[] = [
   { 
-    id: 'ant', pos: 1, name: 'K. Antonelli', code: 'ANT', team: 'Mercedes', country: 'ITA', pts: 69, gap: 0, color: '#27F4D2', isFav: true,
-    bio: "The 19-year-old sensation has become the youngest-ever Formula 1 championship leader. After a win in Shanghai and a gritty recovery victory at Suzuka, Kimi is the undisputed frontrunner of the 2026 season.",
-    careerStats: { wins: 2, podiums: 3, titles: 0, races: 3 },
+    id: 'ant', pos: 1, name: 'K. Antonelli', code: 'ANT', team: 'Mercedes', country: 'ITA', pts: 84, gap: 0, color: '#27F4D2', isFav: true,
+    bio: "The 19-year-old sensation has become the youngest-ever Formula 1 championship leader. Back-to-back wins in Shanghai and Suzuka, plus a P3 in Miami, have extended his commanding lead. Kimi is the undisputed frontrunner of the 2026 season.",
+    careerStats: { wins: 2, podiums: 4, titles: 0, races: 4 },
     image: '/Driver-photo/Antonelli.png'
   },
   { 
-    id: 'rus', pos: 2, name: 'G. Russell', code: 'RUS', team: 'Mercedes', country: 'GBR', pts: 56, gap: -13, color: '#27F4D2',
-    bio: "George remains a core title contender. After leading a Mercedes 1-2 in the season opener and securing P2 in China, his consistency at the front is keeping the pressure on his record-breaking teammate.",
-    careerStats: { wins: 5, podiums: 24, titles: 0, races: 146 },
+    id: 'rus', pos: 2, name: 'G. Russell', code: 'RUS', team: 'Mercedes', country: 'GBR', pts: 68, gap: -16, color: '#27F4D2',
+    bio: "George remains a core title contender. After leading a Mercedes 1-2 in the season opener and securing P2 in China, a P4 in Miami keeps him firmly in championship contention behind his record-breaking teammate.",
+    careerStats: { wins: 5, podiums: 24, titles: 0, races: 147 },
     image: '/Driver-photo/Russel.jpg'
   },
   { 
-    id: 'lec', pos: 3, name: 'C. Leclerc', code: 'LEC', team: 'Ferrari', country: 'MON', pts: 42, gap: -27, color: '#E8002D',
-    bio: "Charles continues to be Ferrari's leading light. His P3 finish at Suzuka in a high-attrition race proved once again that his technical management of the hybrid systems is second to none.",
-    careerStats: { wins: 12, podiums: 45, titles: 0, races: 154 },
+    id: 'lec', pos: 3, name: 'C. Leclerc', code: 'LEC', team: 'Ferrari', country: 'MON', pts: 50, gap: -34, color: '#E8002D',
+    bio: "Charles continues to be Ferrari's leading light. His P3 finish at Suzuka and P6 in Miami proved his technical management of the hybrid systems is second to none — but Red Bull's surge threatens his podium position.",
+    careerStats: { wins: 12, podiums: 45, titles: 0, races: 155 },
     image: '/Driver-photo/Leclerc.png'
   },
   { 
-    id: 'nor', pos: 4, name: 'L. Norris', code: 'NOR', team: 'McLaren', country: 'GBR', pts: 30, gap: -39, color: '#FF8000',
-    bio: "Lando is leading a resurgent McLaren squad. While he missed the podium in Japan, his consistent points haul keeps the Woking squad in the hunt for a top-3 constructor finish.",
-    careerStats: { wins: 5, podiums: 29, titles: 0, races: 132 },
-    image: '/Driver-photo/Norris.png'
-  },
-  { 
-    id: 'pia', pos: 5, name: 'O. Piastri', code: 'PIA', team: 'McLaren', country: 'AUS', pts: 22, gap: -47, color: '#FF8000',
-    bio: "Oscar delivered a spectacular P2 at Suzuka, capitalizing on a late safety car. The 'Ice Man' of 2026 is proving he can challenge for wins when the technical window opens.",
-    careerStats: { wins: 3, podiums: 13, titles: 0, races: 85 },
-    image: '/Driver-photo/Piastri.jpg'
-  },
-  { 
-    id: 'ham', pos: 6, name: 'L. Hamilton', code: 'HAM', team: 'Ferrari', country: 'GBR', pts: 29, gap: -40, color: '#E8002D',
-    bio: "The 7-time champion showed vintage form in China but had a difficult strategic run in Japan. Lewis is still the master of energy deployment in the scarlet Ferrari.",
-    careerStats: { wins: 105, podiums: 202, titles: 7, races: 362 },
-    image: '/Driver-photo/Hamilton.png'
-  },
-  { 
-    id: 'ver', pos: 7, name: 'M. Verstappen', code: 'VER', team: 'Red Bull', country: 'NED', pts: 24, gap: -45, color: '#EF0107',
-    bio: "A challenging start for the 5-time champion. Technical issues with the Red Bull Ford PU have plagued his Asian leg, but the team's Miami upgrade package is highly anticipated.",
-    careerStats: { wins: 64, podiums: 112, titles: 5, races: 215 },
+    id: 'ver', pos: 4, name: 'M. Verstappen', code: 'VER', team: 'Red Bull', country: 'NED', pts: 49, gap: -35, color: '#EF0107',
+    bio: "The Red Bull Ford upgrade delivered. Max Verstappen dominated the Miami Grand Prix, converting pole to victory and announcing the Austrian squad's return to winning form. The 5-time champion is now a serious title threat.",
+    careerStats: { wins: 65, podiums: 113, titles: 5, races: 216 },
     image: '/Driver-photo/Verstappen.jpg'
   },
   { 
-    id: 'bea', pos: 9, name: 'O. Bearman', code: 'BEA', team: 'Haas', country: 'GBR', pts: 12, gap: -56, color: '#B6BABD',
+    id: 'nor', pos: 5, name: 'L. Norris', code: 'NOR', team: 'McLaren', country: 'GBR', pts: 48, gap: -36, color: '#FF8000',
+    bio: "Lando delivered McLaren's best result of the season with P2 in Miami, capitalizing on his tire management and a stunning late overtake on Russell. The Woking squad is now a genuine threat for the constructors' podium.",
+    careerStats: { wins: 5, podiums: 30, titles: 0, races: 133 },
+    image: '/Driver-photo/Norris.png'
+  },
+  { 
+    id: 'ham', pos: 6, name: 'L. Hamilton', code: 'HAM', team: 'Ferrari', country: 'GBR', pts: 39, gap: -45, color: '#E8002D',
+    bio: "The 7-time champion showed vintage form in China but had a difficult strategic run in Japan and Miami. Lewis is still the master of energy deployment in the scarlet Ferrari, but the gap to the top is growing.",
+    careerStats: { wins: 105, podiums: 202, titles: 7, races: 363 },
+    image: '/Driver-photo/Hamilton.png'
+  },
+  { 
+    id: 'pia', pos: 7, name: 'O. Piastri', code: 'PIA', team: 'McLaren', country: 'AUS', pts: 28, gap: -56, color: '#FF8000',
+    bio: "Oscar delivered a spectacular P2 at Suzuka, capitalizing on a late safety car. A P7 in Miami was a quieter outing, but the 'Ice Man' of 2026 is proving he can challenge for wins when the technical window opens.",
+    careerStats: { wins: 3, podiums: 13, titles: 0, races: 86 },
+    image: '/Driver-photo/Piastri.jpg'
+  },
+  { 
+    id: 'bea', pos: 9, name: 'O. Bearman', code: 'BEA', team: 'Haas', country: 'GBR', pts: 12, gap: -72, color: '#B6BABD',
     bio: "The young Brit confirmed his potential in 2024 and is now a regular point-scorer at Haas. His ability to handle high-G loads and varying weather conditions has made him a fan favorite.",
     careerStats: { wins: 0, podiums: 0, titles: 0, races: 32 },
     image: '/Driver-photo/Bearman.png'
@@ -63,10 +63,10 @@ export const DRIVERS: Driver[] = [
 ];
 
 export const TEAMS: Team[] = [
-  { id: 'merc', pos: 1, name: 'Mercedes-AMG', engine: 'Mercedes PU', country: 'DEU', pts: 125, color: '#27F4D2', isFav: true },
-  { id: 'ferr', pos: 2, name: 'Scuderia Ferrari', engine: 'Ferrari PU', country: 'ITA', pts: 71, color: '#E8002D' },
-  { id: 'mcla', pos: 3, name: 'McLaren', engine: 'Mercedes PU', country: 'GBR', pts: 52, color: '#FF8000' },
-  { id: 'redb', pos: 4, name: 'Red Bull Racing', engine: 'Red Bull Ford', country: 'AUT', pts: 36, color: '#EF0107' },
+  { id: 'merc', pos: 1, name: 'Mercedes-AMG', engine: 'Mercedes PU', country: 'DEU', pts: 152, color: '#27F4D2', isFav: true },
+  { id: 'ferr', pos: 2, name: 'Scuderia Ferrari', engine: 'Ferrari PU', country: 'ITA', pts: 89, color: '#E8002D' },
+  { id: 'mcla', pos: 3, name: 'McLaren', engine: 'Mercedes PU', country: 'GBR', pts: 76, color: '#FF8000' },
+  { id: 'redb', pos: 4, name: 'Red Bull Racing', engine: 'Red Bull Ford', country: 'AUT', pts: 61, color: '#EF0107' },
   { id: 'rbul', pos: 5, name: 'Racing Bulls', engine: 'Red Bull Ford', country: 'ITA', pts: 42, color: '#6692FF', isFav: true },
   { id: 'haas', pos: 6, name: 'Haas F1', engine: 'Ferrari PU', country: 'USA', pts: 18, color: '#B6BABD' },
   { id: 'alpi', pos: 7, name: 'Alpine', engine: 'Mercedes PU', country: 'FRA', pts: 10, color: '#0093CC' },
@@ -136,10 +136,18 @@ export const CALENDAR: Race[] = [
     location: 'Jeddah Corniche Circuit · Jeddah', laps: 50, distance: '308.450 km'
   },
   { 
-    round: 6, country: 'USA', flag: '🇺🇸', circuit: 'Miami', date: 'May 02–04', isNext: true,
-    location: 'Miami International Autodrome · Hard Rock Stadium', laps: 57, distance: '308.326 km'
+    round: 6, country: 'USA', flag: '🇺🇸', circuit: 'Miami', date: 'May 04', winner: 'M. Verstappen', isDone: true,
+    location: 'Miami International Autodrome · Hard Rock Stadium', laps: 57, distance: '308.326 km',
+    podiumDetailed: [
+      { driver: 'M. Verstappen', team: 'Red Bull', gap: 'WINNER' },
+      { driver: 'L. Norris', team: 'McLaren', gap: '+4.721s' },
+      { driver: 'K. Antonelli', team: 'Mercedes', gap: '+9.338s' }
+    ],
+    fastestLap: { driver: 'M. Verstappen', time: '1:28.842' },
+    strategy: 'M-H · Upgrade Delivers', weather: 'Sunny · 32°C',
+    leadingTeam: { name: 'Mercedes-AMG', pts: 152, color: '#27F4D2' }
   },
-  { round: 7, country: 'Italy', flag: '🇮🇹', circuit: 'Imola', date: 'May 16–18', location: 'Autodromo Enzo e Dino Ferrari · Emilia-Romagna', laps: 63, distance: '309.049 km' },
+  { round: 7, country: 'Italy', flag: '🇮🇹', circuit: 'Imola', date: 'May 16–18', isNext: true, location: 'Autodromo Enzo e Dino Ferrari · Emilia-Romagna', laps: 63, distance: '309.049 km' },
   { round: 8, country: 'Monaco', flag: '🇲🇨', circuit: 'Monte Carlo', date: 'May 23–25', location: 'Circuit de Monaco · Monte Carlo', laps: 78, distance: '260.286 km' },
   { round: 9, country: 'Spain', flag: '🇪🇸', circuit: 'Barcelona', date: 'May 30–Jun 01', location: 'Circuit de Barcelona-Catalunya · Montmeló', laps: 66, distance: '307.236 km' },
   { round: 10, country: 'Canada', flag: '🇨🇦', circuit: 'Montreal', date: 'Jun 13–15', location: 'Circuit Gilles Villeneuve · Montreal', laps: 70, distance: '305.270 km' },
@@ -167,8 +175,8 @@ export const NEWS: NewsItem[] = [
   },
   { 
     id: 2, kicker: 'Engine Wars', 
-    headline: "Red Bull Ford PU down on deployment; mapping fix expected for Miami", 
-    body: "Paddock sources suggest the inaugural Red Bull Ford power unit is struggling with its 350kW MGU-K deployment efficiency. While the V6 internal combustion element is competitive, the electrical 'clipping' on long straights cost Max Verstappen nearly 0.4s per lap in Japan. Christian Horner confirmed a 'significant' software patch for the Energy Management System is being fast-tracked for the Miami Grand Prix to combat the Mercedes advantage."
+    headline: "Red Bull Ford PU upgrade delivers: Verstappen dominates Miami", 
+    body: "The 'significant' software patch for the Red Bull Ford Energy Management System lived up to its billing at the Miami Grand Prix. Max Verstappen led every lap from pole to take a dominant victory, his first win of the 2026 season. Paddock sources confirm the EMS fix eliminated the 350kW MGU-K deployment clipping that had cost nearly 0.4s per lap in Japan. Red Bull's upgrade has reset the championship picture heading into the European leg."
   },
   { 
     id: 3, kicker: 'Aero Update', 
@@ -193,10 +201,10 @@ export const NEWS: NewsItem[] = [
 ];
 
 export const TICKER_ITEMS = [
-  { sym: 'WDC', val: 'ANTONELLI ⭐', pts: '69 pts' },
-  { sym: 'GAP', val: 'RUSSELL', pts: '-13 pts' },
-  { sym: 'WCC', val: 'MERCEDES ⭐', pts: '125 pts' },
-  { sym: 'NEXT', val: 'MIAMI GP', pts: 'MAY 2' },
+  { sym: 'WDC', val: 'ANTONELLI ⭐', pts: '84 pts' },
+  { sym: 'GAP', val: 'RUSSELL', pts: '-16 pts' },
+  { sym: 'WCC', val: 'MERCEDES ⭐', pts: '152 pts' },
+  { sym: 'NEXT', val: 'IMOLA GP', pts: 'MAY 16' },
   { sym: 'RECORD', val: 'ANTONELLI', pts: '19y LEADER' },
-  { sym: 'SC', val: 'BEARMAN CRASH', pts: 'JPN RECOVERY' },
+  { sym: 'WIN', val: 'VERSTAPPEN', pts: 'MIAMI WIN' },
 ];
