@@ -86,7 +86,7 @@ function parseFallbackRaceDate(dateLabel: string): { start: Date; end: Date } | 
   const match = normalized.match(/^([A-Za-z]{3})\s+(\d{1,2})(?:[–-]([A-Za-z]{3})?\s?(\d{1,2}))?$/);
   if (!match) return null;
 
-  const [, startMonthLabel, startDayLabel, endMonthLabel, endDayLabel] = match;
+  const [_fullMatch, startMonthLabel, startDayLabel, endMonthLabel, endDayLabel] = match;
   const startMonth = MONTH_MAP[startMonthLabel];
   if (startMonth === undefined) return null;
 
@@ -109,14 +109,20 @@ function getFallbackRace(): UpcomingRaceData {
   const futureRace = CALENDAR.find(r => {
     if (r.isDone || r.isCancelled) return false;
     const parsedDate = parseFallbackRaceDate(r.date);
-    return parsedDate ? parsedDate.end.getTime() >= now : true;
+    return parsedDate ? parsedDate.end.getTime() >= now : false;
   });
 
   const nextRace = futureRace || CALENDAR.find(r => !r.isDone && !r.isCancelled) || CALENDAR[0];
   const parsedNextDate = parseFallbackRaceDate(nextRace.date);
+  const fallbackParsedDate = CALENDAR
+    .filter(r => !r.isDone && !r.isCancelled)
+    .map(r => parseFallbackRaceDate(r.date))
+    .find(date => Boolean(date));
   const fallbackCountdownTarget = parsedNextDate
     ? `${parsedNextDate.start.toISOString().split('T')[0]}T${DEFAULT_RACE_START_TIME}`
-    : '2026-05-18T13:00:00Z';
+    : fallbackParsedDate
+      ? `${fallbackParsedDate.start.toISOString().split('T')[0]}T${DEFAULT_RACE_START_TIME}`
+      : new Date(now + 3600000).toISOString();
 
   return {
     nextRace,
