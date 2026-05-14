@@ -69,8 +69,8 @@ export function UpcomingRace({ theme = 'dark' }: { theme?: 'dark' | 'light' }) {
 
             <div className="flex flex-wrap gap-6 md:gap-9 mt-6 pt-5.5 border-t border-white/15">
               {[
-                { label: 'Lap Record', val: '1:15.484' },
-                { label: 'Pole 2025', val: theme === 'dark' ? 'M. Verstappen' : 'G. Russell' },
+                { label: 'Lap Record', val: '1:15.484 (L. Hamilton, 2020)' },
+                { label: 'Pole 2024', val: 'M. Verstappen' },
                 { label: 'Dates', val: nextRace.date },
               ].map((stat, i) => (
                 <div key={i} className="flex flex-col">
