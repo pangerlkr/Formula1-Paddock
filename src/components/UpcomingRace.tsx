@@ -7,15 +7,35 @@ import { motion } from 'motion/react';
 import { useEffect, useState } from 'react';
 
 import { CALENDAR } from '../constants.ts';
+import { fetchUpcomingRaceData } from '../services/raceScheduleService.ts';
 
 export function UpcomingRace({ theme = 'dark' }: { theme?: 'dark' | 'light' }) {
   const [timeLeft, setTimeLeft] = useState({ d: '00', h: '00', m: '00', s: '00' });
-  const nextRace = CALENDAR.find(r => r.isNext) || CALENDAR[0];
+  const [nextRace, setNextRace] = useState(CALENDAR.find(r => r.isNext) || CALENDAR[0]);
+  const [totalRounds, setTotalRounds] = useState(24);
+  const [countdownTarget, setCountdownTarget] = useState('2026-05-18T13:00:00Z');
+  const [scheduleSource, setScheduleSource] = useState<'live' | 'fallback'>('fallback');
 
   useEffect(() => {
-    // Target date from the calendar or default
-    const targetDateStr = '2026-05-18T13:00:00Z';
-    const target = new Date(targetDateStr).getTime();
+    let active = true;
+    const loadUpcomingRace = async () => {
+      const raceData = await fetchUpcomingRaceData();
+      if (!active) return;
+
+      setNextRace(raceData.nextRace);
+      setTotalRounds(raceData.totalRounds);
+      setCountdownTarget(raceData.countdownTarget);
+      setScheduleSource(raceData.source);
+    };
+
+    loadUpcomingRace();
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    const target = new Date(countdownTarget).getTime();
     const pad = (n: number) => String(Math.max(0, n)).padStart(2, '0');
 
     const tick = () => {
@@ -35,7 +55,7 @@ export function UpcomingRace({ theme = 'dark' }: { theme?: 'dark' | 'light' }) {
     tick();
     const id = setInterval(tick, 1000);
     return () => clearInterval(id);
-  }, []);
+  }, [countdownTarget]);
 
   return (
     <section className="px-6 md:px-9 max-w-7xl mx-auto">
@@ -64,13 +84,13 @@ export function UpcomingRace({ theme = 'dark' }: { theme?: 'dark' | 'light' }) {
               <strong className="text-white font-medium">{nextRace.location}</strong>
             </div>
             <div className="font-sans text-[11px] md:text-sm text-white/70">
-              Round {nextRace.round} of 24 · {nextRace.laps} laps · {nextRace.distance}
+              Round {nextRace.round} of {totalRounds} · {nextRace.laps || 'TBA'} laps · {nextRace.distance || 'TBA'}
             </div>
 
             <div className="flex flex-wrap gap-6 md:gap-9 mt-6 pt-5.5 border-t border-white/15">
               {[
-                { label: 'Lap Record', val: '1:15.484 (L. Hamilton, 2020)' },
-                { label: 'Pole 2024', val: 'M. Verstappen' },
+                { label: 'Season', val: '2026 Championship' },
+                { label: 'Feed', val: scheduleSource === 'live' ? 'Live Schedule' : 'Fallback Data' },
                 { label: 'Dates', val: nextRace.date },
               ].map((stat, i) => (
                 <div key={i} className="flex flex-col">
