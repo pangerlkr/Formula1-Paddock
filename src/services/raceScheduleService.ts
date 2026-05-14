@@ -3,6 +3,22 @@ import { Race } from '../types.ts';
 
 const ERGAST_2026_RACES_URL = 'https://api.jolpi.ca/ergast/f1/2026/races/?format=json';
 const DEFAULT_RACE_START_TIME = '13:00:00Z';
+const FALLBACK_SEASON_YEAR = 2026;
+const ONE_HOUR_IN_MS = 3600000;
+const MONTH_MAP: Record<string, number> = {
+  Jan: 0,
+  Feb: 1,
+  Mar: 2,
+  Apr: 3,
+  May: 4,
+  Jun: 5,
+  Jul: 6,
+  Aug: 7,
+  Sep: 8,
+  Oct: 9,
+  Nov: 10,
+  Dec: 11,
+};
 
 interface ErgastRace {
   round: string;
@@ -66,13 +82,55 @@ function formatRaceDate(isoDate: string): string {
   }).format(date);
 }
 
+function parseFallbackRaceDate(dateLabel: string): { start: Date; end: Date } | null {
+  const normalized = dateLabel.replace(/[—−]/g, '–').replace(/\s+/g, ' ').trim();
+  const match = normalized.match(/^([A-Za-z]{3})\s+(\d{1,2})(?:[–-]([A-Za-z]{3})?\s?(\d{1,2}))?$/);
+  if (!match) return null;
+
+  const [_fullMatch, startMonthLabel, startDayLabel, endMonthLabel, endDayLabel] = match;
+  const startMonth = MONTH_MAP[startMonthLabel];
+  if (startMonth === undefined) return null;
+
+  const startDay = Number(startDayLabel);
+  const endMonth = endMonthLabel ? MONTH_MAP[endMonthLabel] : startMonth;
+  const endDay = endDayLabel ? Number(endDayLabel) : startDay;
+
+  if (endMonth === undefined || Number.isNaN(startDay) || Number.isNaN(endDay)) return null;
+
+  const startYear = FALLBACK_SEASON_YEAR;
+  const endYear = endMonth < startMonth ? FALLBACK_SEASON_YEAR + 1 : FALLBACK_SEASON_YEAR;
+  const start = new Date(Date.UTC(startYear, startMonth, startDay, 0, 0, 0));
+  const end = new Date(Date.UTC(endYear, endMonth, endDay, 23, 59, 59));
+  if (end.getTime() < start.getTime()) return null;
+
+  return { start, end };
+}
+
 function getFallbackRace(): UpcomingRaceData {
-  const nextRace = CALENDAR.find(r => r.isNext) || CALENDAR.find(r => !r.isDone && !r.isCancelled) || CALENDAR[0];
+  const now = Date.now();
+  const futureRace = CALENDAR.find(r => {
+    if (r.isDone || r.isCancelled) return false;
+    const parsedDate = parseFallbackRaceDate(r.date);
+    return parsedDate ? parsedDate.end.getTime() >= now : false;
+  });
+
+  const nextRace = futureRace || CALENDAR.find(r => !r.isDone && !r.isCancelled) || CALENDAR[0];
+  const parsedNextDate = parseFallbackRaceDate(nextRace.date);
+  const fallbackParsedDate = CALENDAR
+    .filter(r => !r.isDone && !r.isCancelled)
+    .map(r => parseFallbackRaceDate(r.date))
+    .find(date => Boolean(date));
+  const fallbackCountdownTarget = parsedNextDate
+    ? `${parsedNextDate.start.toISOString().split('T')[0]}T${DEFAULT_RACE_START_TIME}`
+    : fallbackParsedDate
+      ? `${fallbackParsedDate.start.toISOString().split('T')[0]}T${DEFAULT_RACE_START_TIME}`
+      : new Date(now + ONE_HOUR_IN_MS).toISOString();
+
   return {
     nextRace,
     totalRounds: 24,
     source: 'fallback',
-    countdownTarget: '2026-05-18T13:00:00Z',
+    countdownTarget: fallbackCountdownTarget,
   };
 }
 
