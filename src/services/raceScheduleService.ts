@@ -82,7 +82,7 @@ function formatRaceDate(isoDate: string): string {
 }
 
 function parseFallbackRaceDate(dateLabel: string): { start: Date; end: Date } | null {
-  const normalized = dateLabel.replace(/\s+/g, ' ').trim();
+  const normalized = dateLabel.replace(/[—−]/g, '–').replace(/\s+/g, ' ').trim();
   const match = normalized.match(/^([A-Za-z]{3})\s+(\d{1,2})(?:[–-]([A-Za-z]{3})?\s?(\d{1,2}))?$/);
   if (!match) return null;
 
@@ -96,8 +96,10 @@ function parseFallbackRaceDate(dateLabel: string): { start: Date; end: Date } | 
 
   if (endMonth === undefined || Number.isNaN(startDay) || Number.isNaN(endDay)) return null;
 
-  const start = new Date(Date.UTC(FALLBACK_SEASON_YEAR, startMonth, startDay, 0, 0, 0));
-  const end = new Date(Date.UTC(FALLBACK_SEASON_YEAR, endMonth, endDay, 23, 59, 59));
+  const startYear = FALLBACK_SEASON_YEAR;
+  const endYear = endMonth < startMonth ? FALLBACK_SEASON_YEAR + 1 : FALLBACK_SEASON_YEAR;
+  const start = new Date(Date.UTC(startYear, startMonth, startDay, 0, 0, 0));
+  const end = new Date(Date.UTC(endYear, endMonth, endDay, 23, 59, 59));
 
   return { start, end };
 }
