@@ -7,7 +7,7 @@ export function StatsRibbon({ theme = 'dark' }: { theme?: 'dark' | 'light' }) {
   const rbrStats = [
     { label: 'Championship Stat', big: 'P1', accent: '· Defending', sub: 'Max Verstappen · Dominant', color: 'racing' },
     { label: 'World Record Stop', big: '1.82', accent: 's', sub: 'Red Bull · Qatar GP', color: 'mercedes' },
-    { label: 'RB22 Efficiency', big: '+12%', accent: '', sub: 'Downforce gain vs 2025', color: 'racing' },
+    { label: 'RB22 Efficiency', big: '+12%', accent: '', sub: 'Downforce gain vs 2026', color: 'racing' },
     { label: 'Wins Since 2022', big: '64', accent: '· Record', sub: 'Milton Keynes Mastery', color: 'mercedes' },
   ];
 
