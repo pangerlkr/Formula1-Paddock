@@ -4,6 +4,7 @@ import { Race } from '../types.ts';
 const ERGAST_2026_RACES_URL = 'https://api.jolpi.ca/ergast/f1/2026/races/?format=json';
 const DEFAULT_RACE_START_TIME = '13:00:00Z';
 const FALLBACK_SEASON_YEAR = 2026;
+const ONE_HOUR_IN_MS = 3600000;
 const MONTH_MAP: Record<string, number> = {
   Jan: 0,
   Feb: 1,
@@ -100,6 +101,7 @@ function parseFallbackRaceDate(dateLabel: string): { start: Date; end: Date } | 
   const endYear = endMonth < startMonth ? FALLBACK_SEASON_YEAR + 1 : FALLBACK_SEASON_YEAR;
   const start = new Date(Date.UTC(startYear, startMonth, startDay, 0, 0, 0));
   const end = new Date(Date.UTC(endYear, endMonth, endDay, 23, 59, 59));
+  if (end.getTime() < start.getTime()) return null;
 
   return { start, end };
 }
@@ -122,7 +124,7 @@ function getFallbackRace(): UpcomingRaceData {
     ? `${parsedNextDate.start.toISOString().split('T')[0]}T${DEFAULT_RACE_START_TIME}`
     : fallbackParsedDate
       ? `${fallbackParsedDate.start.toISOString().split('T')[0]}T${DEFAULT_RACE_START_TIME}`
-      : new Date(now + 3600000).toISOString();
+      : new Date(now + ONE_HOUR_IN_MS).toISOString();
 
   return {
     nextRace,
