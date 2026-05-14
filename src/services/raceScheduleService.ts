@@ -3,6 +3,21 @@ import { Race } from '../types.ts';
 
 const ERGAST_2026_RACES_URL = 'https://api.jolpi.ca/ergast/f1/2026/races/?format=json';
 const DEFAULT_RACE_START_TIME = '13:00:00Z';
+const FALLBACK_SEASON_YEAR = 2026;
+const MONTH_MAP: Record<string, number> = {
+  Jan: 0,
+  Feb: 1,
+  Mar: 2,
+  Apr: 3,
+  May: 4,
+  Jun: 5,
+  Jul: 6,
+  Aug: 7,
+  Sep: 8,
+  Oct: 9,
+  Nov: 10,
+  Dec: 11,
+};
 
 interface ErgastRace {
   round: string;
@@ -66,13 +81,46 @@ function formatRaceDate(isoDate: string): string {
   }).format(date);
 }
 
+function parseFallbackRaceDate(dateLabel: string): { start: Date; end: Date } | null {
+  const normalized = dateLabel.replace(/\s+/g, ' ').trim();
+  const match = normalized.match(/^([A-Za-z]{3})\s+(\d{1,2})(?:[–-]([A-Za-z]{3})?\s?(\d{1,2}))?$/);
+  if (!match) return null;
+
+  const [, startMonthLabel, startDayLabel, endMonthLabel, endDayLabel] = match;
+  const startMonth = MONTH_MAP[startMonthLabel];
+  if (startMonth === undefined) return null;
+
+  const startDay = Number(startDayLabel);
+  const endMonth = endMonthLabel ? MONTH_MAP[endMonthLabel] : startMonth;
+  const endDay = endDayLabel ? Number(endDayLabel) : startDay;
+
+  if (endMonth === undefined || Number.isNaN(startDay) || Number.isNaN(endDay)) return null;
+
+  const start = new Date(Date.UTC(FALLBACK_SEASON_YEAR, startMonth, startDay, 0, 0, 0));
+  const end = new Date(Date.UTC(FALLBACK_SEASON_YEAR, endMonth, endDay, 23, 59, 59));
+
+  return { start, end };
+}
+
 function getFallbackRace(): UpcomingRaceData {
-  const nextRace = CALENDAR.find(r => r.isNext) || CALENDAR.find(r => !r.isDone && !r.isCancelled) || CALENDAR[0];
+  const now = Date.now();
+  const futureRace = CALENDAR.find(r => {
+    if (r.isDone || r.isCancelled) return false;
+    const parsedDate = parseFallbackRaceDate(r.date);
+    return parsedDate ? parsedDate.end.getTime() >= now : true;
+  });
+
+  const nextRace = futureRace || CALENDAR.find(r => !r.isDone && !r.isCancelled) || CALENDAR[0];
+  const parsedNextDate = parseFallbackRaceDate(nextRace.date);
+  const fallbackCountdownTarget = parsedNextDate
+    ? `${parsedNextDate.start.toISOString().split('T')[0]}T${DEFAULT_RACE_START_TIME}`
+    : '2026-05-18T13:00:00Z';
+
   return {
     nextRace,
     totalRounds: 24,
     source: 'fallback',
-    countdownTarget: '2026-05-18T13:00:00Z',
+    countdownTarget: fallbackCountdownTarget,
   };
 }
 
