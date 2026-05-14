@@ -147,7 +147,7 @@ export const CALENDAR: Race[] = [
     strategy: 'M-H · Upgrade Delivers', weather: 'Sunny · 32°C',
     leadingTeam: { name: 'Mercedes-AMG', pts: 152, color: '#27F4D2' }
   },
-  { round: 7, country: 'Italy', flag: '🇮🇹', circuit: 'Imola', date: 'May 16–18', isNext: true, location: 'Autodromo Enzo e Dino Ferrari · Emilia-Romagna', laps: 63, distance: '309.049 km' },
+  { round: 7, country: 'Emilia-Romagna', flag: '🇮🇹', circuit: 'Imola', date: 'May 16–18', isNext: true, location: 'Autodromo Enzo e Dino Ferrari · Emilia-Romagna', laps: 63, distance: '309.049 km' },
   { round: 8, country: 'Monaco', flag: '🇲🇨', circuit: 'Monte Carlo', date: 'May 23–25', location: 'Circuit de Monaco · Monte Carlo', laps: 78, distance: '260.286 km' },
   { round: 9, country: 'Spain', flag: '🇪🇸', circuit: 'Barcelona', date: 'May 30–Jun 01', location: 'Circuit de Barcelona-Catalunya · Montmeló', laps: 66, distance: '307.236 km' },
   { round: 10, country: 'Canada', flag: '🇨🇦', circuit: 'Montreal', date: 'Jun 13–15', location: 'Circuit Gilles Villeneuve · Montreal', laps: 70, distance: '305.270 km' },
